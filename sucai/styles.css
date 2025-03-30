@@ -1,0 +1,468 @@
+:root {
+    --primary-color: #4a6fa5;
+    --primary-rgb: 74, 111, 165;
+    --secondary-color: #6c757d;
+    --accent-color: #ff9f43;
+    --light-bg: #f8f9fa;
+    --dark-bg: #212529;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --bg-color: #ffffff;
+    --text-color: #333333;
+    --border-color: #dddddd;
+}
+
+body {
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background-color: var(--light-bg);
+    color: #333;
+    padding-bottom: 70px;
+}
+
+/* 标题与部分标题 */
+.section-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 1rem 0;
+    color: var(--primary-color);
+    border-left: 4px solid var(--primary-color);
+    padding-left: 10px;
+}
+
+/* 卡片样式 */
+.card {
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    margin-bottom: 15px;
+    border: none;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.card-title {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.card-icon {
+    font-size: 2rem;
+    color: var(--primary-color);
+}
+
+/* 底部导航栏 */
+.bottom-nav {
+    background-color: white;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+.nav-btn {
+    border: none;
+    background: none;
+    color: var(--secondary-color);
+    padding: 10px 0;
+    text-align: center;
+    font-size: 0.8rem;
+    transition: all 0.3s;
+}
+
+.nav-btn.active {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.nav-icon {
+    font-size: 1.5rem;
+    display: block;
+    margin-bottom: 2px;
+}
+
+/* 预设项 */
+.preset-item {
+    background-color: white;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: all 0.3s;
+}
+
+.preset-item:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* 操作按钮 */
+.action-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: all 0.3s;
+}
+
+.action-btn:hover {
+    transform: scale(1.05);
+}
+
+.add-btn {
+    background-color: var(--accent-color);
+    color: white;
+    position: fixed;
+    right: 20px;
+    bottom: 80px;
+    z-index: 900;
+}
+
+.add-btn:hover {
+    background-color: #f39123;
+}
+
+/* 置顶闹钟样式 */
+.pinned-alarm {
+    border-left: 3px solid var(--primary-color);
+    background-color: rgba(var(--primary-rgb), 0.05);
+    padding-left: 10px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.theme-dark .pinned-alarm {
+    background-color: rgba(90, 132, 191, 0.1);
+}
+
+/* 闹钟时间显示 */
+.alarm-time {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-bottom: 5px;
+    color: var(--primary-color);
+}
+
+/* 计时器控制区域 */
+.timer-controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+/* 界面切换 */
+.screen {
+    display: none;
+    animation: fadeIn 0.3s;
+}
+
+.screen.active {
+    display: block;
+}
+
+/* 计时器圆形进度 */
+.timer-circle {
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    margin: 20px auto;
+    position: relative;
+    background: conic-gradient(var(--primary-color) 0%, #eaeaea 0%);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.timer-circle-inner {
+    position: absolute;
+    width: 190px;
+    height: 190px;
+    background: white;
+    border-radius: 50%;
+    top: 15px;
+    left: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.timer-display {
+    font-size: 2.5rem;
+    font-weight: 300;
+    font-family: 'Roboto Mono', monospace;
+}
+
+/* 秒表显示 */
+.stopwatch-display {
+    font-size: 3.5rem;
+    font-weight: 300;
+    text-align: center;
+    margin: 40px 0;
+    font-family: 'Roboto Mono', monospace;
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* 计时结束动画 */
+.timer-complete {
+    animation: pulse 0.5s infinite;
+    color: var(--accent-color);
+}
+
+/* 按钮状态 */
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: #3a5a84;
+    border-color: #3a5a84;
+}
+
+.btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* 主题类样式 */
+.theme-light {
+    --primary-color: #4a6fa5;
+    --primary-rgb: 74, 111, 165;
+    --secondary-color: #6c757d;
+    --accent-color: #ff9f43;
+    --light-bg: #f8f9fa;
+    --dark-bg: #212529;
+    background-color: var(--light-bg);
+    color: #333;
+}
+
+.theme-light .card, 
+.theme-light .preset-item, 
+.theme-light .timer-circle-inner,
+.theme-light .bottom-nav,
+.theme-light .modal-content {
+    background-color: white;
+}
+
+.theme-light .text-muted {
+    color: #6c757d !important;
+}
+
+.theme-dark {
+    --primary-color: #5a80b6;
+    --primary-rgb: 90, 128, 182;
+    --secondary-color: #adb5bd;
+    --accent-color: #f39123;
+    --light-bg: #f8f9fa;
+    --dark-bg: #212529;
+    background-color: var(--dark-bg);
+    color: #f0f0f0;
+}
+
+.theme-dark .card, 
+.theme-dark .preset-item, 
+.theme-dark .timer-circle-inner,
+.theme-dark .bottom-nav,
+.theme-dark .modal-content,
+.theme-dark .list-group-item,
+.theme-dark .accordion-item {
+    background-color: #343a40;
+    color: #f0f0f0;
+    border-color: #495057;
+}
+
+.theme-dark .modal-header,
+.theme-dark .modal-footer {
+    border-color: #495057;
+}
+
+.theme-dark .text-muted {
+    color: #adb5bd !important;
+}
+
+.theme-dark .nav-btn {
+    color: #adb5bd;
+}
+
+.theme-dark .nav-btn.active {
+    color: var(--accent-color);
+}
+
+.theme-dark input,
+.theme-dark select,
+.theme-dark textarea,
+.theme-dark .form-control,
+.theme-dark .form-select {
+    background-color: #495057;
+    border-color: #6c757d;
+    color: #f0f0f0;
+}
+
+.theme-dark .form-check-input {
+    background-color: #495057;
+    border-color: #6c757d;
+}
+
+.theme-dark .btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+.theme-dark .btn-outline-secondary {
+    color: #adb5bd;
+    border-color: #6c757d;
+}
+
+.theme-dark .btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* 默认深色模式媒体查询 */
+@media (prefers-color-scheme: dark) {
+    body:not(.theme-light) {
+        background-color: var(--dark-bg);
+        color: #f0f0f0;
+    }
+    
+    body:not(.theme-light) .card, 
+    body:not(.theme-light) .preset-item, 
+    body:not(.theme-light) .timer-circle-inner,
+    body:not(.theme-light) .bottom-nav,
+    body:not(.theme-light) .modal-content,
+    body:not(.theme-light) .list-group-item,
+    body:not(.theme-light) .accordion-item {
+        background-color: #343a40;
+        color: #f0f0f0;
+        border-color: #495057;
+    }
+    
+    body:not(.theme-light) .modal-header,
+    body:not(.theme-light) .modal-footer {
+        border-color: #495057;
+    }
+    
+    body:not(.theme-light) .text-muted {
+        color: #adb5bd !important;
+    }
+    
+    body:not(.theme-light) .nav-btn {
+        color: #adb5bd;
+    }
+    
+    body:not(.theme-light) .nav-btn.active {
+        color: var(--accent-color);
+    }
+    
+    body:not(.theme-light) input,
+    body:not(.theme-light) select,
+    body:not(.theme-light) textarea,
+    body:not(.theme-light) .form-control,
+    body:not(.theme-light) .form-select {
+        background-color: #495057;
+        border-color: #6c757d;
+        color: #f0f0f0;
+    }
+    
+    body:not(.theme-light) .form-check-input {
+        background-color: #495057;
+        border-color: #6c757d;
+    }
+    
+    body:not(.theme-light) .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+    
+    body:not(.theme-light) .btn-outline-secondary {
+        color: #adb5bd;
+        border-color: #6c757d;
+    }
+    
+    body:not(.theme-light) .btn-outline-primary {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+}
+
+/* 移动设备适配 */
+@media (max-width: 576px) {
+    .stopwatch-display, .timer-display {
+        font-size: 2rem;
+    }
+    
+    .alarm-time {
+        font-size: 1.5rem;
+    }
+    
+    .timer-circle {
+        width: 180px;
+        height: 180px;
+    }
+    
+    .timer-circle-inner {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .action-btn {
+        width: 45px;
+        height: 45px;
+    }
+}
+
+/* 闹钟通知样式 */
+.alarm-alert {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
+}
+
+.alarm-alert-content {
+    background-color: var(--bg-color);
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 80%;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* 深色模式 */
+[data-bs-theme="dark"] {
+    --primary-color: #5a80b6;
+    --primary-rgb: 90, 128, 182;
+    --accent-color: #f39123;
+    --bg-color: #121212;
+    --text-color: #f1f1f1;
+    --border-color: #444444;
+} 

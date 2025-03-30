@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时间工具</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4a6fa5">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <script>
+        // 注册 Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker 注册成功:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Service Worker 注册失败:', error);
+                    });
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <!-- 计时器界面 -->
+        <div id="timer-screen" class="screen active">
+            <h1 class="my-4 text-center">计时器</h1>
+            
+            <div class="section-title d-flex justify-content-between align-items-center">
+                我的预设
+                <button id="add-timer-btn" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-plus"></i> 添加
+                </button>
+            </div>
+            <div id="preset-container">
+                <!-- 预设列表将通过JavaScript动态渲染 -->
+            </div>
+            
+            <div class="section-title">运动健身</div>
+            <div class="row">
+                <div class="col-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-heart-pulse card-icon me-2"></i>
+                                <h5 class="card-title mb-0">HIIT训练</h5>
+                            </div>
+                            <p class="card-text small">30秒运动，10秒休息，8组</p>
+                            <button class="btn btn-sm btn-primary w-100">使用</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-lightning card-icon me-2"></i>
+                                <h5 class="card-title mb-0">力量训练</h5>
+                            </div>
+                            <p class="card-text small">45秒运动，60秒休息，5组</p>
+                            <button class="btn btn-sm btn-primary w-100">使用</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section-title">学习相关</div>
+            <div class="row">
+                <div class="col-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-book card-icon me-2"></i>
+                                <h5 class="card-title mb-0">番茄工作法</h5>
+                            </div>
+                            <p class="card-text small">25分钟专注，5分钟休息</p>
+                            <button class="btn btn-sm btn-primary w-100">使用</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-pencil card-icon me-2"></i>
+                                <h5 class="card-title mb-0">长时学习</h5>
+                            </div>
+                            <p class="card-text small">50分钟专注，10分钟休息</p>
+                            <button class="btn btn-sm btn-primary w-100">使用</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section-title">其他</div>
+            <div class="row">
+                <div class="col-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-cup-hot card-icon me-2"></i>
+                                <h5 class="card-title mb-0">冥想时间</h5>
+                            </div>
+                            <p class="card-text small">15分钟的放松冥想</p>
+                            <button class="btn btn-sm btn-primary w-100">使用</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-egg-fried card-icon me-2"></i>
+                                <h5 class="card-title mb-0">烹饪计时</h5>
+                            </div>
+                            <p class="card-text small">自定义烹饪时间提醒</p>
+                            <button class="btn btn-sm btn-primary w-100">使用</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 闹钟界面 -->
+        <div id="alarm-screen" class="screen">
+            <h1 class="my-4 text-center">闹钟</h1>
+            
+            <div class="section-title d-flex justify-content-between align-items-center">
+                置顶闹钟
+                <button id="add-alarm-btn" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-plus"></i> 添加
+                </button>
+            </div>
+            <div class="pinned-alarms">
+                <!-- 置顶闹钟将通过JavaScript动态渲染 -->
+            </div>
+            
+            <div class="section-title">其他闹钟</div>
+            <div class="other-alarms">
+                <!-- 普通闹钟将通过JavaScript动态渲染 -->
+            </div>
+        </div>
+        
+        <!-- 秒表界面 -->
+        <div id="stopwatch-screen" class="screen">
+            <h1 class="my-4 text-center">秒表</h1>
+            
+            <div class="stopwatch-display">00:00:00</div>
+            
+            <div class="timer-controls">
+                <button class="action-btn btn btn-outline-secondary rounded-circle">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                </button>
+                <button class="action-btn btn btn-primary rounded-circle">
+                    <i class="bi bi-play-fill"></i>
+                </button>
+                <button class="action-btn btn btn-outline-primary rounded-circle">
+                    <i class="bi bi-flag-fill"></i>
+                </button>
+            </div>
+            
+            <div class="mt-4">
+                <div class="section-title">记录</div>
+                <div class="preset-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title mb-1">计次 #1</h5>
+                            <small class="text-muted">00:45:23</small>
+                        </div>
+                        <span>+00:45:23</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 我的界面 -->
+        <div id="profile-screen" class="screen">
+            <h1 class="my-4 text-center">我的</h1>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="bi bi-person-circle fs-1"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-1">用户名</h5>
+                            <p class="mb-0 text-muted">点击登录/注册</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="list-group mb-4">
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="bi bi-palette me-2"></i>
+                        深色模式
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="theme-switch">
+                    </div>
+                </div>
+                <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="bi bi-bell me-2"></i>
+                        通知设置
+                    </div>
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+                <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="bi bi-music-note-list me-2"></i>
+                        提示音设置
+                    </div>
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+            
+            <div class="list-group mb-4">
+                <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="bi bi-question-circle me-2"></i>
+                        帮助中心
+                    </div>
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+                <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="bi bi-info-circle me-2"></i>
+                        关于应用
+                    </div>
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 添加按钮 -->
+    <button class="action-btn add-btn">
+        <i class="bi bi-plus-lg"></i>
+    </button>
+    
+    <!-- 底部导航栏 -->
+    <div class="bottom-nav">
+        <div class="row m-0">
+            <div class="col-3 p-0">
+                <button class="nav-btn active w-100" id="timer-btn" data-screen="timer-screen">
+                    <i class="bi bi-hourglass-split nav-icon"></i>
+                    计时器
+                </button>
+            </div>
+            <div class="col-3 p-0">
+                <button class="nav-btn w-100" id="alarm-btn" data-screen="alarm-screen">
+                    <i class="bi bi-alarm nav-icon"></i>
+                    闹钟
+                </button>
+            </div>
+            <div class="col-3 p-0">
+                <button class="nav-btn w-100" id="stopwatch-btn" data-screen="stopwatch-screen">
+                    <i class="bi bi-stopwatch nav-icon"></i>
+                    秒表
+                </button>
+            </div>
+            <div class="col-3 p-0">
+                <button class="nav-btn w-100" id="profile-btn" data-screen="profile-screen">
+                    <i class="bi bi-person nav-icon"></i>
+                    我的
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html> 
