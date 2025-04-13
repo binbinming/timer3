@@ -71,7 +71,7 @@ class _AddTimerGroupDialogState extends State<AddTimerGroupDialog> {
       _timerNameControllers.add(nameController);
 
       final minutes = timer.minutes;
-      final seconds = 0; // 假设没有秒级精度，可以根据需要修改
+      const seconds = 0; // 假设没有秒级精度，可以根据需要修改
 
       final minuteController = TextEditingController(text: minutes.toString());
       _timerMinuteControllers.add(minuteController);

@@ -5,7 +5,7 @@ import 'screens/home_screen.dart';
 import 'providers/timer_provider.dart';
 import 'providers/alarm_provider.dart';
 import 'providers/stopwatch_provider.dart';
-import 'providers/theme_provider.dart';
+import 'providers/settings_provider.dart';
 import 'services/notification_service.dart';
 
 void main() async {
@@ -24,22 +24,45 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => TimerProvider()),
         ChangeNotifierProvider(create: (_) => AlarmProvider()),
         ChangeNotifierProvider(create: (_) => StopwatchProvider()),
+        ChangeNotifierProvider(create: (_) => SettingsProvider()),
       ],
       child: const TimerApp(),
     );
   }
 }
 
-class TimerApp extends StatelessWidget {
+class TimerApp extends StatefulWidget {
   const TimerApp({super.key});
 
   @override
+  State<TimerApp> createState() => _TimerAppState();
+}
+
+class _TimerAppState extends State<TimerApp> {
+  @override
+  void initState() {
+    super.initState();
+    // 延迟初始化，等待context准备好
+    Future.microtask(() {
+      final timerProvider = Provider.of<TimerProvider>(context, listen: false);
+      final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
+      
+      // 设置context
+      timerProvider.setContext(context);
+      settingsProvider.setContext(context);
+      
+      // 加载数据
+      timerProvider.loadData();
+      settingsProvider.loadSettings();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final settingsProvider = Provider.of<SettingsProvider>(context);
 
     return MaterialApp(
       title: '时间管理',
@@ -58,7 +81,7 @@ class TimerApp extends StatelessWidget {
           brightness: Brightness.dark,
         ),
       ),
-      themeMode: themeProvider.themeMode,
+      themeMode: settingsProvider.themeMode,
       home: HomeScreen(key: homeScreenKey),
     );
   }

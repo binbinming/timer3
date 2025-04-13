@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/timer_model.dart';
 import '../models/timer_group_model.dart';
 import '../services/notification_service.dart';
+import '../services/api_service.dart';
 import '../screens/home_screen.dart';
 
 enum TimerStatus { idle, running, paused, completed }
@@ -13,6 +14,7 @@ class TimerProvider extends ChangeNotifier {
   static const String _presetKey = 'timer_presets';
   static const String _presetCategoryKey = 'timer_preset_categories';
   static const String _groupsKey = 'timer_groups';
+  BuildContext? _context;
 
   // 预设列表
   List<TimerModel> _presets = [];
@@ -394,27 +396,68 @@ class TimerProvider extends ChangeNotifier {
   // 保存预设
   Future<void> _savePresets() async {
     try {
+      // 保存到服务器
+      if (_context != null) {
+        await ApiService.saveTimerPresets(
+          presets: _presets,
+          categories: _categories,
+          context: _context!,
+        );
+      }
+
+      // 同时保存到本地
       final prefs = await SharedPreferences.getInstance();
       final presetsJson =
           _presets.map((preset) => jsonEncode(preset.toJson())).toList();
       await prefs.setStringList(_presetKey, presetsJson);
-
-      // 同时保存分类列表
       await prefs.setStringList(_presetCategoryKey, _categories);
     } catch (e) {
       debugPrint('保存预设失败: $e');
+      // 如果服务器保存失败，至少保存到本地
+      _saveToLocal();
     }
   }
 
   // 保存计时器组
   Future<void> _saveGroups() async {
     try {
+      // 保存到服务器
+      if (_context != null) {
+        await ApiService.saveTimerGroups(
+          groups: _groups,
+          context: _context!,
+        );
+      }
+
+      // 同时保存到本地
       final prefs = await SharedPreferences.getInstance();
       final groupsJson =
           _groups.map((group) => jsonEncode(group.toJson())).toList();
       await prefs.setStringList(_groupsKey, groupsJson);
     } catch (e) {
       debugPrint('保存计时器组失败: $e');
+      // 如果服务器保存失败，至少保存到本地
+      _saveToLocal();
+    }
+  }
+
+  // 保存所有数据到本地
+  Future<void> _saveToLocal() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      // 保存预设
+      final presetsJson =
+          _presets.map((preset) => jsonEncode(preset.toJson())).toList();
+      await prefs.setStringList(_presetKey, presetsJson);
+      await prefs.setStringList(_presetCategoryKey, _categories);
+      
+      // 保存计时器组
+      final groupsJson =
+          _groups.map((group) => jsonEncode(group.toJson())).toList();
+      await prefs.setStringList(_groupsKey, groupsJson);
+    } catch (e) {
+      debugPrint('保存到本地存储失败: $e');
     }
   }
 
@@ -957,6 +1000,58 @@ class TimerProvider extends ChangeNotifier {
 
     _status = TimerStatus.paused; // 设置为暂停状态，等待用户手动开始
     notifyListeners();
+  }
+
+  void setContext(BuildContext context) {
+    _context = context;
+  }
+
+  // 从服务器和本地加载数据
+  Future<void> loadData() async {
+    try {
+      if (_context != null) {
+        // 尝试从服务器加载数据
+        final serverData = await ApiService.getTimerData(context: _context!);
+        if (serverData != null) {
+          _presets = (serverData['presets'] as List)
+              .map((preset) => TimerModel.fromJson(preset))
+              .toList();
+          _groups = (serverData['groups'] as List)
+              .map((group) => TimerGroupModel.fromJson(group))
+              .toList();
+          _categories = List<String>.from(serverData['categories'] ?? _categories);
+        }
+      }
+    } catch (e) {
+      debugPrint('从服务器加载数据失败: $e');
+      // 如果服务器加载失败，从本地加载
+      await _loadFromLocal();
+    }
+    notifyListeners();
+  }
+
+  // 从本地加载数据
+  Future<void> _loadFromLocal() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      // 加载预设
+      final presetsJson = prefs.getStringList(_presetKey) ?? [];
+      _presets = presetsJson
+          .map((json) => TimerModel.fromJson(jsonDecode(json)))
+          .toList();
+      
+      // 加载分类
+      _categories = prefs.getStringList(_presetCategoryKey) ?? _categories;
+      
+      // 加载计时器组
+      final groupsJson = prefs.getStringList(_groupsKey) ?? [];
+      _groups = groupsJson
+          .map((json) => TimerGroupModel.fromJson(jsonDecode(json)))
+          .toList();
+    } catch (e) {
+      debugPrint('从本地加载数据失败: $e');
+    }
   }
 
   @override

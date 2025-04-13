@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import '../providers/timer_provider.dart';
-import '../providers/theme_provider.dart';
+import '../providers/settings_provider.dart';
 import '../models/timer_model.dart';
 import '../models/timer_preset_model.dart';
 import '../models/timer_group_model.dart';
@@ -77,7 +77,7 @@ class _TimerScreenState extends State<TimerScreen>
   @override
   Widget build(BuildContext context) {
     final timerProvider = Provider.of<TimerProvider>(context);
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final settingsProvider = Provider.of<SettingsProvider>(context);
     final presetsByCategory = timerProvider.presetsByCategory;
 
     // 更新可排序分类列表
@@ -95,40 +95,45 @@ class _TimerScreenState extends State<TimerScreen>
       return _buildRunningTimer(context, timerProvider);
     }
 
-    return Scaffold(
-      body: Column(
-        children: [
-          TabBar(
-            controller: _tabController,
-            tabs: const [
-              Tab(icon: Icon(Icons.timer), text: '计时器'),
-              Tab(icon: Icon(Icons.playlist_play), text: '计时器组'),
-            ],
-          ),
-          Expanded(
-            child: TabBarView(
+    return Theme(
+      data: Theme.of(context).copyWith(
+        colorScheme: Theme.of(context).colorScheme,
+      ),
+      child: Scaffold(
+        body: Column(
+          children: [
+            TabBar(
               controller: _tabController,
-              children: [
-                // 单个计时器标签页
-                _buildTimersTabContent(timerProvider, presetsByCategory),
-
-                // 计时器组标签页
-                _buildTimerGroupsTab(timerProvider),
+              tabs: const [
+                Tab(icon: Icon(Icons.timer), text: '计时器'),
+                Tab(icon: Icon(Icons.playlist_play), text: '计时器组'),
               ],
             ),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // 根据当前标签页决定显示哪种对话框
-          if (_tabController.index == 0) {
-            _showAddTimerDialog(context, timerProvider);
-          } else {
-            _showTimerGroupDialog(context, timerProvider);
-          }
-        },
-        child: const Icon(Icons.add),
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  // 单个计时器标签页
+                  _buildTimersTabContent(timerProvider, presetsByCategory),
+
+                  // 计时器组标签页
+                  _buildTimerGroupsTab(timerProvider),
+                ],
+              ),
+            ),
+          ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            // 根据当前标签页决定显示哪种对话框
+            if (_tabController.index == 0) {
+              _showAddTimerDialog(context, timerProvider);
+            } else {
+              _showTimerGroupDialog(context, timerProvider);
+            }
+          },
+          child: const Icon(Icons.add),
+        ),
       ),
     );
   }
@@ -1193,7 +1198,7 @@ class _TimerScreenState extends State<TimerScreen>
                       padding: const EdgeInsets.symmetric(vertical: 2.0),
                       child: Text(
                         '总进度: ${(currentProgress * 100).toStringAsFixed(0)}%',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ),
@@ -1817,11 +1822,11 @@ class LandscapeTimerScreen extends StatelessWidget {
                                 fontSize: maxHeight * 0.04,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
-                                shadows: [
+                                shadows: const [
                                   Shadow(
                                     color: Colors.black45,
                                     blurRadius: 5,
-                                    offset: const Offset(1, 1),
+                                    offset: Offset(1, 1),
                                   ),
                                 ],
                               ),
@@ -1834,11 +1839,11 @@ class LandscapeTimerScreen extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: maxHeight * 0.03,
                                     color: Colors.white.withOpacity(0.8),
-                                    shadows: [
+                                    shadows: const [
                                       Shadow(
                                         color: Colors.black45,
                                         blurRadius: 5,
-                                        offset: const Offset(1, 1),
+                                        offset: Offset(1, 1),
                                       ),
                                     ],
                                   ),

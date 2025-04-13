@@ -3,20 +3,32 @@ import '../models/timer_group_model.dart';
 
 class TimerGroupCard extends StatelessWidget {
   final TimerGroupModel group;
-  final VoidCallback onTap;
-  final VoidCallback onEdit;
-  final VoidCallback onDelete;
+  final VoidCallback? onTap;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
   final VoidCallback? onTogglePin;
   final bool isPinned;
+  final bool showActions;
+
+  // 添加常量Map来存储图标代码和对应的IconData
+  static final Map<int, IconData> iconDataMap = {
+    Icons.work.codePoint: Icons.work,
+    Icons.school.codePoint: Icons.school,
+    Icons.fitness_center.codePoint: Icons.fitness_center,
+    Icons.self_improvement.codePoint: Icons.self_improvement,
+    Icons.timer.codePoint: Icons.timer,
+    // 添加其他可能用到的图标
+  };
 
   const TimerGroupCard({
     super.key,
     required this.group,
-    required this.onTap,
-    required this.onEdit,
-    required this.onDelete,
+    this.onTap,
+    this.onEdit,
+    this.onDelete,
     this.onTogglePin,
     required this.isPinned,
+    this.showActions = true,
   });
 
   @override
@@ -122,21 +134,33 @@ class TimerGroupCard extends StatelessWidget {
               ),
 
               // 编辑/删除按钮行
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  if (onTogglePin != null)
-                    IconButton(
-                      icon: Icon(
-                        isPinned ? Icons.push_pin : Icons.push_pin_outlined,
-                        size: 14,
-                        color:
-                            isPinned
-                                ? Theme.of(context).colorScheme.primary
-                                : null,
+              if (showActions)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    if (onTogglePin != null)
+                      IconButton(
+                        icon: Icon(
+                          isPinned ? Icons.push_pin : Icons.push_pin_outlined,
+                          size: 14,
+                          color:
+                              isPinned
+                                  ? Theme.of(context).colorScheme.primary
+                                  : null,
+                        ),
+                        onPressed: onTogglePin,
+                        tooltip: isPinned ? '取消置顶' : '置顶',
+                        visualDensity: VisualDensity.compact,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(
+                          minWidth: 28,
+                          minHeight: 28,
+                        ),
                       ),
-                      onPressed: onTogglePin,
-                      tooltip: isPinned ? '取消置顶' : '置顶',
+                    IconButton(
+                      icon: const Icon(Icons.edit, size: 14),
+                      onPressed: onEdit,
+                      tooltip: '编辑',
                       visualDensity: VisualDensity.compact,
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(
@@ -144,34 +168,23 @@ class TimerGroupCard extends StatelessWidget {
                         minHeight: 28,
                       ),
                     ),
-                  IconButton(
-                    icon: const Icon(Icons.edit, size: 14),
-                    onPressed: onEdit,
-                    tooltip: '编辑',
-                    visualDensity: VisualDensity.compact,
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(
-                      minWidth: 28,
-                      minHeight: 28,
+                    IconButton(
+                      icon: Icon(
+                        Icons.delete,
+                        size: 14,
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                      onPressed: onDelete,
+                      tooltip: '删除',
+                      visualDensity: VisualDensity.compact,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(
+                        minWidth: 28,
+                        minHeight: 28,
+                      ),
                     ),
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.delete,
-                      size: 14,
-                      color: Theme.of(context).colorScheme.error,
-                    ),
-                    onPressed: onDelete,
-                    tooltip: '删除',
-                    visualDensity: VisualDensity.compact,
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(
-                      minWidth: 28,
-                      minHeight: 28,
-                    ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
             ],
           ),
         ),
@@ -181,8 +194,8 @@ class TimerGroupCard extends StatelessWidget {
 
   // 获取图标
   IconData _getIconData() {
-    if (group.iconCode != null) {
-      return IconData(group.iconCode!, fontFamily: 'MaterialIcons');
+    if (group.iconCode != null && iconDataMap.containsKey(group.iconCode)) {
+      return iconDataMap[group.iconCode]!;
     }
 
     // 默认图标

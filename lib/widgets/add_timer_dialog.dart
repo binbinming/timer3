@@ -50,6 +50,9 @@ class _AddTimerDialogState extends State<AddTimerDialog> {
     Icons.bed,
   ];
 
+  // 添加常量Map来存储图标代码和对应的IconData
+  static final Map<int, IconData> iconDataMap = {};
+
   @override
   void initState() {
     super.initState();
@@ -93,6 +96,11 @@ class _AddTimerDialogState extends State<AddTimerDialog> {
       }
     };
     AppEvents().categoryAddedNotifier.addListener(_categoryListener);
+
+    // 在initState中初始化图标映射
+    for (final icon in _commonIcons) {
+      iconDataMap[icon.codePoint] = icon;
+    }
   }
 
   @override
@@ -812,7 +820,7 @@ class _AddTimerDialogState extends State<AddTimerDialog> {
                       ),
                       child: Icon(
                         _iconCode != null
-                            ? IconData(_iconCode!, fontFamily: 'MaterialIcons')
+                            ? _getIconData(_iconCode) ?? _getIconByType(_type)
                             : _getIconByType(_type),
                         color: Colors.white,
                         size: 20,
@@ -1038,6 +1046,12 @@ class _AddTimerDialogState extends State<AddTimerDialog> {
       case TimerPresetType.other:
         return Colors.grey;
     }
+  }
+
+  // 修改获取图标的方法
+  IconData? _getIconData(int? codePoint) {
+    if (codePoint == null) return null;
+    return iconDataMap[codePoint] ?? Icons.timer;
   }
 }
 

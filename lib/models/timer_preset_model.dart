@@ -31,9 +31,9 @@ class TimerPresetModel {
     final s = seconds;
 
     if (h > 0) {
-      return '$h小时' + (m > 0 ? ' $m分' : '') + (s > 0 ? ' $s秒' : '');
+      return '$h小时${m > 0 ? ' $m分' : ''}${s > 0 ? ' $s秒' : ''}';
     } else if (m > 0) {
-      return '$m分' + (s > 0 ? ' $s秒' : '');
+      return '$m分${s > 0 ? ' $s秒' : ''}';
     } else {
       return '$s秒';
     }

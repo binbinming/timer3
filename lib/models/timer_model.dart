@@ -101,7 +101,7 @@ class TimerModel {
   @override
   String toString() {
     final minutesPart = minutes > 0 ? '${minutes.toInt()}分' : '';
-    final secondsPart = seconds > 0 ? '${seconds}秒' : '';
+    final secondsPart = seconds > 0 ? '$seconds秒' : '';
     final durationText = minutesPart + secondsPart;
     return '$name ($durationText)';
   }

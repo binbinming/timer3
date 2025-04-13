@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import '../providers/theme_provider.dart';
 import '../providers/timer_provider.dart';
 import 'timer_screen.dart';
 import 'alarm_screen.dart';
 import 'stopwatch_screen.dart';
-import 'profile_screen.dart';
 import 'settings_screen.dart';
 
 // 全局key，用于获取HomeScreen状态
@@ -268,56 +266,44 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final timerProvider = Provider.of<TimerProvider>(context, listen: false);
-
     return WillPopScope(
       onWillPop: () async {
-        print('Flutter: WillPopScope触发，当前计时器运行状态: $_isTimerRunning');
-
-        // 优先顺序：对话框 > 计时器运行 > 计时器暂停 > 默认返回
-
-        // 检查对话框状态
-        if (_isDialogOpen || isDialogOpenGlobal) {
-          print('Flutter: 对话框开启中，允许关闭对话框');
-          return true; // 允许系统关闭对话框
+        // 如果对话框开启，允许返回键关闭对话框
+        if (_isDialogOpen) {
+          print('Flutter: 对话框开启中，允许返回键关闭对话框');
+          return true;
         }
 
-        // 检查计时器运行状态
-        if (_isTimerRunning || isTimerRunningGlobal) {
-          if (timerProvider.status == TimerStatus.running) {
-            print('Flutter: 计时器正在运行中，执行最小化');
-            await _minimizeApp();
-            return false; // 不执行默认返回
-          } else {
-            print('Flutter: 计时器暂停中，返回主屏幕');
-            TimerScreen.handleGoBack(context);
-            return false; // 不执行默认返回
-          }
+        // 如果计时器正在运行，执行最小化
+        if (_isTimerRunning) {
+          print('Flutter: 计时器运行中，执行最小化');
+          await _minimizeApp();
+          return false;
         }
 
-        // 默认行为：允许系统执行返回
-        print('Flutter: 默认返回行为');
+        // 双击返回退出应用
+        if (_lastBackPressTime == null ||
+            DateTime.now().difference(_lastBackPressTime!) >
+                const Duration(seconds: 2)) {
+          // 第一次点击
+          _lastBackPressTime = DateTime.now();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('再按一次退出应用'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+          return false;
+        }
         return true;
       },
       child: Scaffold(
         appBar: AppBar(
           title: Text(_titles[_selectedIndex]),
-          actions: [
-            // 只保留深色模式切换按钮
-            IconButton(
-              icon: Icon(
-                themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode,
-              ),
-              onPressed: () => themeProvider.toggleTheme(),
-              tooltip: themeProvider.isDarkMode ? '切换至亮色模式' : '切换至深色模式',
-            ),
-          ],
+          centerTitle: true,
         ),
         body: PageView(
           controller: _pageController,
-          // 允许随时滑动切换页面
-          physics: const AlwaysScrollableScrollPhysics(),
           onPageChanged: (index) {
             setState(() {
               _selectedIndex = index;
@@ -327,7 +313,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         ),
         bottomNavigationBar: NavigationBar(
           selectedIndex: _selectedIndex,
-          // 允许在计时器运行时也能使用底部导航栏切换
           onDestinationSelected: (index) {
             _pageController.animateToPage(
               index,
@@ -335,14 +320,33 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               curve: Curves.easeInOut,
             );
           },
-          destinations: const [
-            NavigationDestination(icon: Icon(Icons.timer), label: '计时器'),
-            NavigationDestination(icon: Icon(Icons.alarm), label: '闹钟'),
+          destinations: [
             NavigationDestination(
-              icon: Icon(Icons.timer_outlined),
-              label: '秒表',
+              icon: Icon(
+                _selectedIndex == 0 ? Icons.timer : Icons.timer_outlined,
+              ),
+              label: _titles[0],
             ),
-            NavigationDestination(icon: Icon(Icons.person), label: '设置'),
+            NavigationDestination(
+              icon: Icon(
+                _selectedIndex == 1 ? Icons.alarm : Icons.alarm_outlined,
+              ),
+              label: _titles[1],
+            ),
+            NavigationDestination(
+              icon: Icon(
+                _selectedIndex == 2
+                    ? Icons.timer_3_sharp
+                    : Icons.timer_3_outlined,
+              ),
+              label: _titles[2],
+            ),
+            NavigationDestination(
+              icon: Icon(
+                _selectedIndex == 3 ? Icons.settings : Icons.settings_outlined,
+              ),
+              label: _titles[3],
+            ),
           ],
         ),
       ),

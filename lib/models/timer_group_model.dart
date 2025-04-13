@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'timer_model.dart';
 
 /// 计时器组模型，表示一组按顺序执行的计时器

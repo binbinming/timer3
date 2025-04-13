@@ -54,14 +54,14 @@ class AlarmProvider extends ChangeNotifier {
       AlarmModel(
         id: 1,
         label: '起床闹钟',
-        timeOfDay: TimeOfDay(hour: 7, minute: 0),
+        timeOfDay: const TimeOfDay(hour: 7, minute: 0),
         weekdays: [1, 2, 3, 4, 5], // 工作日
         isPinned: true,
       ),
       AlarmModel(
         id: 2,
         label: '周末闹钟',
-        timeOfDay: TimeOfDay(hour: 8, minute: 30),
+        timeOfDay: const TimeOfDay(hour: 8, minute: 30),
         weekdays: [0, 6], // 周末
       ),
     ];

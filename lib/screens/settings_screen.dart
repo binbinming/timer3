@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:provider/provider.dart';
-import '../providers/theme_provider.dart';
+import '../providers/settings_provider.dart';
 import 'version_info_screen.dart';
 import 'privacy_policy_screen.dart';
 import 'terms_of_service_screen.dart';
+import '../widgets/edit_profile_dialog.dart';
+import 'dart:io';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -15,6 +17,16 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   double _rating = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // 设置 context
+    Future.microtask(() {
+      final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
+      settingsProvider.setContext(context);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,29 +58,64 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final settingsProvider = Provider.of<SettingsProvider>(context);
+    
     return Container(
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
           // 头像
-          Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Theme.of(context).colorScheme.primaryContainer,
-            ),
-            child: Icon(
-              Icons.person,
-              size: 60,
-              color: Theme.of(context).colorScheme.onPrimaryContainer,
+          GestureDetector(
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) => const EditProfileDialog(),
+              );
+            },
+            child: Stack(
+              alignment: Alignment.bottomRight,
+              children: [
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    image: settingsProvider.avatarPath != null
+                        ? DecorationImage(
+                            image: FileImage(File(settingsProvider.avatarPath!)),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
+                  ),
+                  child: settingsProvider.avatarPath == null
+                      ? Icon(
+                          Icons.person,
+                          size: 60,
+                          color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        )
+                      : null,
+                ),
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.edit,
+                    size: 20,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
+                ),
+              ],
             ),
           ),
 
           const SizedBox(height: 16),
 
           // 用户名
-          Text('时间管理大师', style: Theme.of(context).textTheme.titleLarge),
+          Text(settingsProvider.username, style: Theme.of(context).textTheme.titleLarge),
 
           const SizedBox(height: 8),
 
@@ -85,7 +132,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildSettingsList(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final settingsProvider = Provider.of<SettingsProvider>(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,19 +149,51 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ),
 
-        // 深色模式设置
+        // 主题模式设置
         Card(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          child: ListTile(
+          child: ExpansionTile(
             leading: Icon(
-              themeProvider.isDarkMode ? Icons.dark_mode : Icons.light_mode,
+              settingsProvider.themeMode == ThemeMode.dark
+                  ? Icons.dark_mode
+                  : settingsProvider.themeMode == ThemeMode.light
+                      ? Icons.light_mode
+                      : Icons.brightness_auto,
               color: Theme.of(context).colorScheme.primary,
             ),
-            title: const Text('深色模式'),
-            trailing: Switch(
-              value: themeProvider.isDarkMode,
-              onChanged: (value) => themeProvider.toggleTheme(),
-            ),
+            title: const Text('主题模式'),
+            children: [
+              RadioListTile<ThemeMode>(
+                title: const Text('跟随系统'),
+                value: ThemeMode.system,
+                groupValue: settingsProvider.themeMode,
+                onChanged: (ThemeMode? value) {
+                  if (value != null) {
+                    settingsProvider.updateThemeMode(value);
+                  }
+                },
+              ),
+              RadioListTile<ThemeMode>(
+                title: const Text('浅色'),
+                value: ThemeMode.light,
+                groupValue: settingsProvider.themeMode,
+                onChanged: (ThemeMode? value) {
+                  if (value != null) {
+                    settingsProvider.updateThemeMode(value);
+                  }
+                },
+              ),
+              RadioListTile<ThemeMode>(
+                title: const Text('深色'),
+                value: ThemeMode.dark,
+                groupValue: settingsProvider.themeMode,
+                onChanged: (ThemeMode? value) {
+                  if (value != null) {
+                    settingsProvider.updateThemeMode(value);
+                  }
+                },
+              ),
+            ],
           ),
         ),
 
@@ -128,10 +207,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             title: const Text('振动'),
             trailing: Switch(
-              value: true,
-              onChanged: (value) {
-                // TODO: 实现振动开关逻辑
-              },
+              value: settingsProvider.isVibrationEnabled,
+              onChanged: (value) => settingsProvider.toggleVibration(value),
             ),
           ),
         ),
@@ -146,10 +223,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             title: const Text('声音'),
             trailing: Switch(
-              value: true,
-              onChanged: (value) {
-                // TODO: 实现声音开关逻辑
-              },
+              value: settingsProvider.isSoundEnabled,
+              onChanged: (value) => settingsProvider.toggleSound(value),
             ),
           ),
         ),
@@ -165,10 +240,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: const Text('通知'),
             subtitle: const Text('允许应用发送通知'),
             trailing: Switch(
-              value: true,
-              onChanged: (value) {
-                // TODO: 实现通知开关逻辑
-              },
+              value: settingsProvider.isNotificationEnabled,
+              onChanged: (value) => settingsProvider.toggleNotification(value),
             ),
           ),
         ),
@@ -231,9 +304,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         Card(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           child: ListTile(
-            leading: Icon(
+            leading: const Icon(
               Icons.star,
-              color: const Color(0xFFFFD700),
+              color: Color(0xFFFFD700),
             ),
             title: const Text('给我们评分'),
             subtitle: Row(
@@ -249,7 +322,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('感谢您的${_rating}星评价！'),
+                        content: Text('感谢您的$_rating星评价！'),
                         duration: const Duration(seconds: 2),
                       ),
                     );
@@ -420,8 +493,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _shareToSocial(String platform) {
-    final String shareText = '推荐一个超好用的计时器应用！';
-    final String shareUrl = 'https://your-app-store-link.com';
+    const String shareText = '推荐一个超好用的计时器应用！';
+    const String shareUrl = 'https://your-app-store-link.com';
     
     switch (platform) {
       case 'facebook':

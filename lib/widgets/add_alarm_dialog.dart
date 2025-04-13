@@ -28,7 +28,7 @@ class _AddAlarmDialogState extends State<AddAlarmDialog> {
       _label = widget.alarm!.label;
       _weekdays = List.from(widget.alarm!.weekdays);
     } else {
-      _timeOfDay = TimeOfDay(hour: 7, minute: 0);
+      _timeOfDay = const TimeOfDay(hour: 7, minute: 0);
       _label = '';
       _weekdays = List.filled(7, 0);
     }

@@ -3,20 +3,31 @@ import '../models/timer_preset_model.dart';
 
 class TimerPresetCard extends StatelessWidget {
   final TimerPresetModel preset;
-  final VoidCallback onTap;
-  final VoidCallback onEdit;
-  final VoidCallback onDelete;
+  final VoidCallback? onTap;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
   final VoidCallback? onTogglePin;
   final bool isPinned;
+  final bool showActions;
+
+  static final Map<TimerPresetType, IconData> typeIconMap = {
+    TimerPresetType.work: Icons.work,
+    TimerPresetType.study: Icons.school,
+    TimerPresetType.exercise: Icons.fitness_center,
+    TimerPresetType.meditation: Icons.self_improvement,
+    TimerPresetType.cooking: Icons.restaurant,
+    TimerPresetType.other: Icons.timer,
+  };
 
   const TimerPresetCard({
     super.key,
     required this.preset,
-    required this.onTap,
-    required this.onEdit,
-    required this.onDelete,
+    this.onTap,
+    this.onEdit,
+    this.onDelete,
     this.onTogglePin,
     required this.isPinned,
+    this.showActions = true,
   });
 
   @override
@@ -48,7 +59,7 @@ class TimerPresetCard extends StatelessWidget {
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
-                        _getIconByType(preset.type),
+                        _getIconByType(),
                         color: Colors.white,
                         size: 16,
                       ),
@@ -131,27 +142,8 @@ class TimerPresetCard extends StatelessWidget {
   }
 
   // 根据类型获取对应图标
-  IconData _getIconByType(TimerPresetType type) {
-    // 如果有自定义图标则使用自定义图标
-    if (preset.iconCode != null) {
-      return IconData(preset.iconCode!, fontFamily: 'MaterialIcons');
-    }
-
-    // 否则使用默认图标
-    switch (type) {
-      case TimerPresetType.work:
-        return Icons.work;
-      case TimerPresetType.study:
-        return Icons.school;
-      case TimerPresetType.exercise:
-        return Icons.fitness_center;
-      case TimerPresetType.meditation:
-        return Icons.self_improvement;
-      case TimerPresetType.cooking:
-        return Icons.restaurant;
-      case TimerPresetType.other:
-        return Icons.timer;
-    }
+  IconData _getIconByType() {
+    return typeIconMap[preset.type] ?? Icons.timer;
   }
 
   // 根据类型获取对应颜色
